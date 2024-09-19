@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目下载</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        #file-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #file-list li {
+            background-color: white;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #file-list li a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #file-list li a:hover {
+            color: var(--secondary-color);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+        .cursor {
+            position: fixed;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .cursor-follower {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            background: rgba(74, 144, 226, 0.2);
+            border: 2px solid rgba(74, 144, 226, 0.5);
+            border-radius: 50%;
+            transition: 0.1s cubic-bezier(0.75, -0.27, 0.3, 1.33) background,
+                        0.1s cubic-bezier(0.75, -0.27, 0.3, 1.33) opacity,
+                        0.1s cubic-bezier(0.75, -0.27, 0.3, 1.33) transform;
+            user-select: none;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+        }
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            opacity: 1;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: width 0.2s, height 0.2s, opacity 0.2s;
+        }
+        .cursor-dot.active {
+            opacity: 0.5;
+            width: 40px;
+            height: 40px;
+        }
+        a:hover ~ .cursor-follower,
+        button:hover ~ .cursor-follower {
+            transform: translate(-50%, -50%) scale(1.5);
+            background: rgba(74, 144, 226, 0.1);
+            border-color: rgba(74, 144, 226, 0.3);
+        }
+    </style>
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://api.github.com">
+</head>
+<body>
+    <div class="container">
+        <h1>项目下载</h1>
+        <ul id="file-list">
+            <!-- 文件列表将通过 JavaScript 动态加载 -->
+        </ul>
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回首页
+        </a>
+    </div>
+    <div class="cursor">
+        <div class="cursor-follower"></div>
+        <div class="cursor-dot"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script>
+        const owner = 'Cybersurfer-1';
+        const repo = 'Cybersurfer.github.io';
+        const path = 'projects';
+
+        async function fetchFiles() {
+            const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
+            const files = await response.json();
+            const fileList = document.getElementById('file-list');
+
+            fileList.innerHTML = ''; // 清空现有列表
+
+            files.forEach(file => {
+                if (file.type === 'file') {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = file.download_url;
+                    a.textContent = file.name;
+                    a.setAttribute('download', '');
+                    li.appendChild(a);
+                    fileList.appendChild(li);
+                }
+            });
+        }
+
+        fetchFiles();
+
+        // 高级鼠标跟随效果
+        const cursor = document.querySelector('.cursor');
+        const follower = document.querySelector('.cursor-follower');
+        const dot = document.querySelector('.cursor-dot');
+
+        let posX = 0,
+            posY = 0,
+            mouseX = 0,
+            mouseY = 0;
+
+        gsap.to({}, 0.008, {
+            repeat: -1,
+            onRepeat: function() {
+                posX += (mouseX - posX) / 5;
+                posY += (mouseY - posY) / 5;
+
+                gsap.set(follower, {
+                    css: {
+                        left: posX,
+                        top: posY
+                    }
+                });
+                gsap.set(dot, {
+                    css: {
+                        left: mouseX,
+                        top: mouseY
+                    }
+                });
+            }
+        });
+
+        document.addEventListener("mousemove", function(e) {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                follower.classList.add('active');
+            });
+            el.addEventListener('mouseleave', () => {
+                follower.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员面板 - Cybersurfer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* 使用与 blog.html 相同的样式变量 */
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        main {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>管理员面板</h1>
+    </header>
+    <main>
+        <form id="blog-form">
+            <input type="text" id="title" placeholder="博客标题" required>
+            <textarea id="content" placeholder="博客内容" rows="10" required></textarea>
+            <button type="submit">发布博客</button>
+        </form>
+        <a href="blog.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回博客页面
+        </a>
+    </main>
+    <script>
+        // 检查管理员登录状态
+        function checkAdminStatus() {
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            if (!isAdmin) {
+                alert('请先登录管理员账户');
+                window.location.href = 'blog.html';
+            }
+        }
+
+        // 发布博客文章
+        async function publishBlogPost(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const date = new Date().toISOString().split('T')[0];
+
+            const newPost = { title, content, date };
+
+            try {
+                const response = await fetch('blog-posts.json');
+                const posts = await response.json();
+                posts.unshift(newPost);
+
+                // 在实际应用中，这里应该发送 POST 请求到服务器
+                // 现在我们只是模拟更新本地存储
+                localStorage.setItem('blog-posts', JSON.stringify(posts));
+
+                alert('博客发布成功！');
+                window.location.href = 'blog.html';
+            } catch (error) {
+                console.error('Error publishing blog post:', error);
+                alert('发布失败，请重试');
+            }
+        }
+
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminStatus();
+            document.getElementById('blog-form').addEventListener('submit', publishBlogPost);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人网页</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --header-bg: #333;
+            --header-text: white;
+        }
+        .dark-mode {
+            --bg-color: #333;
+            --text-color: #f4f4f4;
+            --header-bg: #1a1a1a;
+            --header-text: #f4f4f4;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        nav ul {
+            display: flex;
+            justify-content: flex-start;
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+        nav ul li {
+            margin: 0 15px;
+            position: relative;
+        }
+        nav ul li a {
+            color: var(--header-text);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            letter-spacing: 1px;
+            padding: 10px 5px;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ffd700;
+        }
+        nav ul li::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #ffd700;
+            transition: width 0.3s ease;
+        }
+        nav ul li:hover::after {
+            width: 100%;
+        }
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+        }
+        #dark-mode-toggle, #language-selector {
+            background-color: transparent;
+            color: var(--header-text);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 15px;
+            transition: color 0.3s ease;
+        }
+        #dark-mode-toggle:hover, #language-selector:hover {
+            color: #ffd700;
+        }
+        #language-selector {
+            padding: 5px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        main {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .slideshow-container {
+            max-width: 800px;
+            height: 500px; /* 设置固定高度 */
+            margin: 0 auto 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .mySlides {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .mySlides.active {
+            opacity: 1;
+        }
+        .mySlides img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        footer {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 20px;
+        }
+        .footer-content {
+            margin-bottom: 1rem;
+        }
+        .footer-content p {
+            margin: 5px 0;
+        }
+        .social-media {
+            margin-top: 1rem;
+        }
+        .social-media a {
+            color: var(--header-text);
+            margin: 0 10px;
+            font-size: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        .social-media a:hover {
+            color: #ffd700;
+        }
+        #dark-mode-toggle {
+            position: static;
+            bottom: auto;
+            right: auto;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        #language-selector {
+            position: static;
+            top: auto;
+            right: auto;
+        }
+        #visit-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background-color: var(--header-text);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            opacity: 0.8;
+        }
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            background-color: var(--header-text);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            mix-blend-mode: difference;
+            opacity: 0.5;
+            transform: scale(0.5);
+        }
+        .cursor-text {
+            position: fixed;
+            color: var(--header-text);
+            pointer-events: none;
+            z-index: 9997;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .cursor-text.show {
+            opacity: 1;
+        }
+        @media screen and (max-width: 600px) {
+            .cursor, .cursor-follower, .cursor-text {
+                display: none;
+            }
+        }
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .preloader-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid var(--header-text);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="preloader">
+        <div class="preloader-spinner"></div>
+    </div>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#home" data-translate="home">首页</a></li>
+                <li><a href="about.html" data-translate="about">关于我</a></li>
+                <li><a href="projects.html" data-translate="projects">项目</a></li>
+                <li><a href="blog.html" data-translate="blog">博客</a></li>
+                <li><a href="messageboard.html" data-translate="messageboard">留言板</a></li>
+                <li><a href="chat.html" data-translate="chat">实时聊天</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <button id="dark-mode-toggle" title="切换暗黑模式">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <select id="language-selector" title="选择语言">
+                    <option value="zh">中文</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home">
+            <div class="slideshow-container">
+                <div class="mySlides">
+                    <img src="img/4.jpg" alt="Slide 1">
+                </div>
+                <div class="mySlides">
+                    <img src="img/3.jpg" alt="Slide 2">
+                </div>
+                <div class="mySlides">
+                    <img src="img/2.jpg" alt="Slide 3">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2024 ByteSurfer. 保留所有权利</p>
+            <p>备案号：赣ICP备202426385226号</p>
+        </div>
+        <div class="social-media">
+            <a href="#" class="fab fa-facebook"></a>
+            <a href="#" class="fab fa-twitter"></a>
+            <a href="#" class="fab fa-instagram"></a>
+            <a href="#" class="fab fa-linkedin"></a>
+        </div>
+    </footer>
+
+    <div id="visit-counter"></div>
+
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    <div class="cursor-text">点击</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script>
+        // 预加载器
+        window.addEventListener('load', () => {
+            document.querySelector('.preloader').style.display = 'none';
+        });
+
+        // 轮播图
+        let slideIndex = 0;
+        const slides = document.getElementsByClassName("mySlides");
+
+        function showSlides() {
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.remove('active');
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            slides[slideIndex-1].classList.add('active');
+            setTimeout(showSlides, 5000); // 每5秒切换一次图片
+        }
+
+        // 预加载图片
+        function preloadImages() {
+            for (let i = 0; i < slides.length; i++) {
+                const img = new Image();
+                img.src = slides[i].querySelector('img').src;
+            }
+        }
+
+        // 页面加载完成后执行
+        window.addEventListener('load', () => {
+            preloadImages();
+            showSlides();
+            document.querySelector('.preloader').style.display = 'none';
+        });
+
+        // 暗黑模式切换
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const body = document.body;
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const icon = darkModeToggle.querySelector('i');
+            if (body.classList.contains('dark-mode')) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            }
+        });
+
+        // 语言切换
+        const languageSelector = document.getElementById('language-selector');
+        const translations = {
+            'zh': {
+                'home': '首页',
+                'about': '关于我',
+                'projects': '项目',
+                'blog': '博客',
+                'messageboard': '留言板',
+                'chat': '实时聊天',
+            },
+            'en': {
+                'home': 'Home',
+                'about': 'About Me',
+                'projects': 'Projects',
+                'blog': 'Blog',
+                'messageboard': 'Message Board',
+                'chat': 'Live Chat',
+            }
+        };
+
+        languageSelector.addEventListener('change', (event) => {
+            const selectedLanguage = event.target.value;
+            updateLanguage(selectedLanguage);
+        });
+
+        function updateLanguage(language) {
+            const elements = document.querySelectorAll('[data-translate]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[language] && translations[language][key]) {
+                    element.textContent = translations[language][key];
+                }
+            });
+        }
+
+        // 初始化语言为中文
+        updateLanguage('zh');
+
+        // 访问计数器
+        function updateVisitCount() {
+            let count = parseInt(localStorage.getItem('visitCount')) || 0;
+            count++;
+            localStorage.setItem('visitCount', count);
+            document.getElementById('visit-counter').textContent = `访问次数：${count}`;
+        }
+
+        updateVisitCount();
+
+        // 鼠标跟随效果
+        const cursor = document.querySelector('.cursor');
+        const cursorFollower = document.querySelector('.cursor-follower');
+        const cursorText = document.querySelector('.cursor-text');
+
+        document.addEventListener('mousemove', e => {
+            const x = e.clientX;
+            const y = e.clientY;
+
+            gsap.to(cursor, {duration: 0.1, x: x, y: y});
+            gsap.to(cursorFollower, {duration: 0.3, x: x, y: y});
+            gsap.to(cursorText, {duration: 0.3, x: x + 20, y: y + 20});
+        });
+
+        document.addEventListener('mousedown', () => {
+            cursorText.classList.add('show');
+        });
+
+        document.addEventListener('mouseup', () => {
+            cursorText.classList.remove('show');
+        });
+
+        // 图片懒加载
+        const images = document.querySelectorAll('.lazy-image');
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    const src = img.getAttribute('data-src');
+                    img.setAttribute('src', src);
+                    img.classList.add('loaded');
+                    observer.unobserve(img);
+                }
+            });
+        });
+
+        images.forEach(img => {
+            imageObserver.observe(img);
+        });
+    </script>
+</body>
+</html>

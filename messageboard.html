@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #f4f4f4;
+            --text-color: #333;
+            --primary-color: #4a90e2;
+            --secondary-color: #f39c12;
+            --accent-color: #e74c3c;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+        .message-form {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .messages {
+            margin-top: 3rem;
+        }
+        .message {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .message-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .message-date {
+            color: #888;
+            font-size: 0.9rem;
+        }
+        .message-content {
+            line-height: 1.5;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .back-link:hover {
+            color: var(--secondary-color);
+        }
+        .admin-login {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .admin-login a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+        .admin-login a:hover {
+            color: var(--secondary-color);
+        }
+        #admin-login-form {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        #admin-login-form input {
+            width: 200px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        #admin-login-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        #admin-login-form button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #admin-login-form button:hover {
+            background-color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>留言板</h1>
+        <div class="admin-login">
+            <a href="#" id="admin-login-link">管理员登录</a>
+            <form id="admin-login-form">
+                <input type="text" id="admin-username" placeholder="用户名" required>
+                <input type="password" id="admin-password" placeholder="密码" required>
+                <button type="submit">登录</button>
+            </form>
+        </div>
+        <div class="message-form">
+            <form id="message-form">
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">邮箱</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">留言</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+                </div>
+                <button type="submit">提交留言</button>
+            </form>
+        </div>
+        <div class="messages">
+            <!-- 示例留言 -->
+            <div class="message">
+                <div class="message-header">
+                    <span class="message-author">张三</span>
+                    <span class="message-date">2024-03-15 14:30</span>
+                </div>
+                <div class="message-content">
+                    这是一个很棒的网站！我很喜欢你的作品。
+                </div>
+            </div>
+            <div class="message">
+                <div class="message-header">
+                    <span class="message-author">李四</span>
+                    <span class="message-date">2024-03-14 09:15</span>
+                </div>
+                <div class="message-content">
+                    你的项目给了我很多灵感。期待看到更多你的作品！
+                </div>
+            </div>
+        </div>
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回首页
+        </a>
+    </div>
+    <script>
+        function displayMessages() {
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const messagesContainer = document.querySelector('.messages');
+            messagesContainer.innerHTML = messages.map(message => `
+                <div class="message">
+                    <div class="message-header">
+                        <span class="message-author">${message.author}</span>
+                        <span class="message-date">${message.date}</span>
+                    </div>
+                    <div class="message-content">${message.content}</div>
+                </div>
+            `).join('');
+        }
+
+        displayMessages();
+
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            const date = new Date().toLocaleString();
+
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const newMessage = {
+                id: Date.now(),
+                author: name,
+                date: date,
+                content: message
+            };
+            messages.push(newMessage);
+            localStorage.setItem('messages', JSON.stringify(messages));
+
+            displayMessages();
+            this.reset();
+            alert('留言已提交！');
+        });
+
+        const adminLoginLink = document.getElementById('admin-login-link');
+        const adminLoginForm = document.getElementById('admin-login-form');
+
+        adminLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            adminLoginForm.style.display = adminLoginForm.style.display === 'none' ? 'block' : 'none';
+        });
+
+        adminLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            if (username === 'ByteSurfer' && password === 'byte2635') {
+                window.location.href = 'admin.html';
+            } else {
+                alert('用户名或密码错误');
+            }
+        });
+
+        // 点击页面其他地方关闭登录表单
+        document.addEventListener('click', (e) => {
+            if (!adminLoginForm.contains(e.target) && e.target !== adminLoginLink) {
+                adminLoginForm.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

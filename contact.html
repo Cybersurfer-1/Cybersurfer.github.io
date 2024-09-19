@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>联系我们</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* ... 保留之前的样式 ... */
+        .fixed-email {
+            background-color: #f0f0f0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>联系我们</h1>
+    </header>
+    <main>
+        <form id="contact-form">
+            <div class="fixed-email">
+                接收邮箱：1270946049@qq.com
+            </div>
+
+            <label for="from-email">您的邮箱：</label>
+            <input type="email" id="from-email" name="from-email" required>
+
+            <label for="name">姓名：</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="message">留言：</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+
+            <button type="submit">发送</button>
+        </form>
+        <a href="index.html" class="back-link">返回首页</a>
+    </main>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('to-email', '1270946049@qq.com');
+
+            fetch('/send-email', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('消息已成功发送！');
+                    this.reset();
+                } else {
+                    alert('发送失败，请稍后再试。');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('发送失败，请稍后再试。');
+            });
+        });
+    </script>
+</body>
+</html>
